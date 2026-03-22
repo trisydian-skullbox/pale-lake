@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout Never: Pale Lake</title>
+<style>
+ @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&family=Space+Mono:wght@400;700&family=Mrs+Saint+Delafield&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:         #080c0b;
+    --bg2:        #0c1210;
+    --bg3:        #101815;
+    --surface:    rgba(255,255,255,0.03);
+    --border:     rgba(255,255,255,0.07);
+    --border2:    rgba(255,255,255,0.12);
+    --text:       #cec9be;
+    --text-dim:   #7a7569;
+    --text-ghost: #3e3c38;
+    --lake:       #3b7a6e;
+    --lake-glow:  #5ba898;
+    --lake-dim:   #1e3d38;
+    --gold:       #b8975a;
+    --gold-dim:   #5c4a27;
+    --horror:     #8c3030;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-weight: 300;
+    font-size: 17px;
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── NOISE TEXTURE OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.35;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    position: relative;
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem 2.5rem;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 55% at 50% 105%, rgba(59,122,110,0.22) 0%, transparent 65%),
+      radial-gradient(ellipse 50% 30% at 50% 100%, rgba(59,122,110,0.12) 0%, transparent 60%),
+      linear-gradient(180deg, #080c0b 0%, #0a110e 60%, #0e1a16 100%);
+  }
+
+  /* treeline silhouette */
+  .treeline {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 180px;
+  }
+
+  /* water shimmer */
+  .water {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background: linear-gradient(180deg, transparent, rgba(59,122,110,0.08) 60%, rgba(59,122,110,0.14));
+  }
+
+  .water-lines {
+    position: absolute;
+    bottom: 8px;
+    left: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding: 0 10%;
+    opacity: 0.25;
+  }
+
+  .water-line {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--lake-glow), transparent);
+    animation: shimmer 4s ease-in-out infinite;
+  }
+  .water-line:nth-child(2) { animation-delay: 1.3s; width: 80%; margin-left: 10%; }
+  .water-line:nth-child(3) { animation-delay: 2.6s; width: 60%; margin-left: 20%; }
+
+  @keyframes shimmer {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 0.6; }
+  }
+
+  /* dot / moon */
+  .moon {
+    position: absolute;
+    top: 1.8rem;
+    left: 2rem;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #d4c9a8, #8a7d62);
+    box-shadow: 0 0 18px 4px rgba(184,151,90,0.3);
+    animation: moonpulse 6s ease-in-out infinite;
+  }
+  @keyframes moonpulse {
+    0%, 100% { box-shadow: 0 0 18px 4px rgba(184,151,90,0.25); }
+    50% { box-shadow: 0 0 28px 8px rgba(184,151,90,0.45); }
+  }
+
+  .hero-content { position: relative; z-index: 2; }
+
+  .hero-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--lake-glow);
+    margin-bottom: 1rem;
+    opacity: 0.8;
+  }
+
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(2.4rem, 7vw, 4.2rem);
+    letter-spacing: 0.04em;
+    color: #e8e2d4;
+    line-height: 1.1;
+    margin-bottom: 0.2rem;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--lake-glow);
+  }
+
+  .hero-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 0.7rem;
+  }
+
+  /* ─── TAGS ─── */
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 8px;
+    padding: 1.2rem 1.5rem;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg2);
+  }
+
+  .tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: lowercase;
+    color: var(--text-dim);
+    border: 1px solid var(--border2);
+    border-radius: 999px;
+    padding: 4px 11px;
+    background: var(--surface);
+  }
+
+  /* ─── CONTENT SECTIONS ─── */
+  .section {
+    padding: 2.5rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--lake-glow);
+    margin-bottom: 0.9rem;
+  }
+
+  /* ─── STORY ─── */
+  .story-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 300;
+    color: #e0d8c8;
+    margin-bottom: 0.9rem;
+    line-height: 1.25;
+  }
+
+  .story-body {
+    color: var(--text);
+    font-size: 1.2rem;
+    line-height: 1.75;
+    max-width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .story-body p + p {
+  margin-top: 1rem;
+}
+
+  /* ─── PULL QUOTE ─── */
+  .pullquote {
+  margin: 0;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  background: linear-gradient(180deg, transparent, rgba(59,122,110,0.06), transparent);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+
+.pullquote p {
+  font-family: 'Space Mono', monospace;
+  font-style: normal;
+  font-size: clamp(0.9rem, 2vw, 1.2rem);
+  color: #d0c8b8;
+  line-height: 1.5;
+  font-weight: 300;
+  max-width: 100%;
+  letter-spacing: 0.08em;
+  text-transform: none;
+}
+
+/* ─── RESORT MAP ─── */
+.map-container {
+  margin-top: 2rem;
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.resort-map {
+  width: 100%;
+  display: block;
+  opacity: 0.85;
+  filter: sepia(20%) brightness(0.9);
+  max-width: 100%;
+  height: auto;
+}
+
+.map-caption {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  color: var(--text-ghost);
+  text-align: center;
+  padding: 0.6rem;
+  background: var(--bg2);
+  font-style: italic;
+}
+  /* ─── FEATURES + DETAILS ─── */
+  .grid-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1px;
+  background: var(--border);
+}
+
+  .grid-cell {
+    background: var(--bg2);
+    padding: 1.2rem 1.3rem;
+  }
+
+  .grid-cell-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    color: var(--lake-glow);
+    margin-bottom: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .grid-cell p {
+    font-family: 'Space Mono', monospace;
+    font-size: 1rem;
+    line-height: 1.9;
+    color: var(--text-dim);
+    letter-spacing: 0.02em;
+  }
+
+  /* ─── SCREENSHOTS ─── */
+  .screenshots-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .screenshot {
+    aspect-ratio: 3/4;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 10px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .screenshot::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.7;
+  }
+
+  /* scene illustrations using CSS */
+  .scene-arrival::before {
+    background:
+      radial-gradient(ellipse 80% 40% at 50% 100%, rgba(59,122,110,0.35) 0%, transparent 60%),
+      linear-gradient(180deg, #0a0e0c 30%, #0d1a15 70%, #0e201a 100%);
+  }
+
+  .scene-arrival::after {
+    content: '';
+    position: absolute;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 55px;
+    background: linear-gradient(180deg, transparent, rgba(59,122,110,0.6));
+    box-shadow: 0 0 12px 4px rgba(59,122,110,0.2);
+  }
+
+  .scene-lodge::before {
+    background:
+      radial-gradient(circle 40px at 30% 45%, rgba(184,151,90,0.3) 0%, transparent 60%),
+      linear-gradient(180deg, #0c0d0b 20%, #141210 100%);
+  }
+
+  .scene-dock::before {
+    background:
+      linear-gradient(180deg, #08100e 0%, #0c1a16 40%, rgba(59,122,110,0.15) 100%),
+      repeating-linear-gradient(90deg, transparent, transparent 18px, rgba(59,122,110,0.04) 18px, rgba(59,122,110,0.04) 19px);
+  }
+
+  .screenshot-label {
+    position: relative;
+    z-index: 2;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.52rem;
+    letter-spacing: 0.12em;
+    text-transform: lowercase;
+    color: var(--text-ghost);
+    font-style: italic;
+  }
+
+   /* ─── DEVLOG ─── */
+  .devlog-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .devlog-item {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .devlog-item:last-child { border-bottom: none; }
+
+  .devlog-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 7px;
+  }
+  .dot-active { background: var(--lake-glow); box-shadow: 0 0 6px var(--lake); }
+  .dot-mid    { background: var(--gold); }
+  .dot-old    { background: var(--text-ghost); }
+
+  .devlog-date {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.58rem;
+    color: var(--text-ghost);
+    letter-spacing: 0.08em;
+    width: 64px;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+
+  .devlog-text {
+    font-size: 0.95rem;
+    color: var(--text-dim);
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    padding: 1.5rem;
+    text-align: center;
+  }
+
+  footer p {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-ghost);
+  }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadein {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-content { animation: fadein 1s ease both; }
+  .tags         { animation: fadein 1s ease 0.15s both; }
+  .section      { animation: fadein 0.8s ease 0.25s both; }
+
+/* ─── CHARACTER CARDS ─── */
+.chars-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.char-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1.2rem 1.3rem;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.char-card:hover {
+  border-color: var(--lake);
+  background: rgba(59,122,110,0.06);
+}
+
+.char-card-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: #e0d8c8;
+  margin-bottom: 0.15rem;
+}
+
+.char-card-role {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lake-glow);
+  margin-bottom: 0.8rem;
+}
+
+.char-card-desc {
+  font-size: 1rem;
+  color: var(--text-dim);
+  line-height: 1.65;
+}
+
+.char-card-locked {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  color: var(--lake-glow);
+  margin-top: 0.8rem;
+  font-style: bold;
+}
+
+css.char-card-image {
+  width: 100%;
+  aspect-ratio: 3/4;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 1rem;
+  border-radius: 3px;
+  filter: brightness(0.9) sepia(10%);
+  transition: filter 0.3s;
+  max-height: 200px
+}
+
+.char-card-placeholder span {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: var(--text-ghost);
+  text-transform: uppercase;
+}
+
+/* ─── ABOUT ─── */
+.about-body {
+  font-size: 1rem;
+  color: var(--text);
+  line-height: 1.8;
+  max-width: 580px;
+}
+
+.about-body p + p {
+  margin-top: 1rem;
+}
+
+.dev-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border2);
+  margin-bottom: 1.2rem;
+  display: block;
+  filter: brightness(0.9) sepia(10%);
+}
+
+/* ─── DESKTOP SCALING ─── */
+@media (min-width: 700px) {
+  body {
+    font-size: 19px;
+  }
+
+  .hero {
+    min-height: 560px;
+    padding: 4rem 3rem 3rem;
+  }
+
+  h1 {
+    font-size: 5rem;
+  }
+
+  .section {
+    padding: 3.5rem 3rem;
+  }
+
+  .tags {
+    padding: 1.4rem 3rem;
+  }
+
+  .story-body {
+    max-width: 100%;
+  }
+
+  .chars-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  .grid-2 {
+    grid-template-columns: 1fr 1fr;
+  }
+
+.char-card-image {
+  width: 55%;
+  max-height: 220px;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+  .screenshots-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .devlog-item {
+    padding: 1rem 0;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── HERO ─── -->
+<div class="hero">
+  <div class="hero-bg"></div>
+
+  <!-- treeline SVG -->
+  <svg class="treeline" viewBox="0 0 800 180" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <g fill="#0a100d" opacity="0.95">
+      <!-- far treeline -->
+      <polygon points="0,180 0,130 20,110 35,120 55,90 70,105 90,80 110,100 130,75 145,95 170,65 185,85 210,60 230,80 255,55 270,75 295,50 315,70 340,45 360,68 385,42 400,62 425,38 445,60 470,35 490,58 515,32 535,55 560,38 580,60 605,30 620,55 645,28 665,52 690,25 710,50 735,30 755,55 780,28 800,50 800,180"/>
+      <!-- mid treeline -->
+      <polygon points="0,180 0,150 30,135 60,120 90,140 120,115 150,130 180,110 210,128 240,105 270,125 300,108 330,128 360,110 390,130 420,108 450,125 480,108 510,128 540,112 570,128 600,110 630,130 660,112 690,132 720,115 750,132 780,118 800,135 800,180"/>
+    </g>
+    <!-- cabin light glow -->
+    <ellipse cx="400" cy="160" rx="80" ry="12" fill="rgba(59,122,110,0.06)"/>
+  </svg>
+
+  <div class="water">
+    <div class="water-lines">
+      <div class="water-line"></div>
+      <div class="water-line"></div>
+      <div class="water-line"></div>
+    </div>
+  </div>
+
+  <div class="moon"></div>
+
+  <div class="hero-content">
+    <p class="hero-eyebrow">a horror romance dating sim</p>
+    <h1>Checkout Never:<br><em>Pale Lake</em></h1>
+    <p class="hero-sub">a game by Trisydian &nbsp;·&nbsp; in development</p>
+  </div>
+</div>
+
+<!-- ─── TAGS ─── -->
+<div class="tags">
+  <span class="tag">horror romance</span>
+  <span class="tag">cursed resort</span>
+  <span class="tag">lake horror</span>
+  <span class="tag">slow burn</span>
+  <span class="tag">mystery</span>
+  <span class="tag">visual novel</span>
+  <span class="tag">indie</span>
+  <span class="tag">6 routes</span>
+</div>
+
+<!-- ─── STORY ─── -->
+<div class="section">
+  <p class="section-label">The Story</p>
+  <p class="story-title">Nobody has ever seen the other shore.</p>
+  <p class="story-body">A photographer follows an unfamiliar road to Pale Lake Cabin Resort. The road home is gone before they think to look for it. The staff are broken in ways they've learned to perform around, and unsettling in ways they haven't bothered to hide. The camera keeps lying. And the lake, the beautiful, fog-swallowed, bottomless lake... breathes.</p>
+  <p class="story-body">Not constantly. Not loudly. But on still nights, or quiet mornings, guests feel it in their sternum before they hear it with their ears. The water has no consistent temperature. It's clear, crystalline almost, but the depth swallows light before it can return. There is simply nothing down there to see. Just more water, going down forever. Guests swim in it anyway. Most of them have the time of their lives. Some of them don't come back. The lake does not distinguish between these outcomes in any way that has ever been identified.</p>
+  <p class="story-body">Checkout Never: Pale Lake is a horror romance for adults. It goes to dark places and it goes to intimate ones and it doesn't apologise for either. Six staff members with histories the lake would prefer you didn't uncover. A camera full of evidence you weren't supposed to find. A Final Ending that only reveals itself to players who've seen everything... and survived it.</p>
+</div>
+<!-- ─── PULL QUOTE ─── -->
+<div class="section" style="padding-top: 0; padding-bottom: 0; border-bottom: none;">
+  <blockquote class="pullquote">
+    <p>A game about masks. A protagonist who doesn't know they're wearing one, romancing characters trapped behind their own, in a place that wants to consume whoever they are underneath.</p>
+  </blockquote>
+</div>
+
+<!-- ─── LOCATION ─── -->
+<div class="section">
+  <p class="section-label">The Resort</p>
+  <p class="story-title">The sun should feel warm. It doesn't.</p>
+  <div class="story-body">
+    <p>Welcome to Pale Lake Cabin Resort — eight private cabins arranged in a crescent on the shore of a beautiful, secluded lake. Enjoy our main lodge with its common area, library, and cozy guest rooms. Gather each evening at the central fire pit for activities hosted by our entertainment staff. Dine at The Last Bite, our charming on-site diner. Explore the surrounding forest trails at your leisure.</p>
+    <p>The resort is maintained to an exceptionally high standard. Guests frequently comment on the attention to detail — the way things are quietly repaired before they notice they were broken, the fire in the lodge that is always already going, the quilt in their cabin that is somehow exactly their favourite colours. We take hospitality seriously here. We always have.</p>
+    <p>We do ask that guests remain on the marked trails. The forest is dense and the paths can be disorienting after dark. There is an old campground further in that is no longer in use. Guests are asked not to explore it. This is for their comfort. The bulletin board in the main lodge is updated each morning with the day's activities. Please note that the handwriting changes. This is normal. The road that brought you here will not be there when you look for it. This is also normal. We hope you enjoy your stay.</p>
+  </div>
+<div class="map-container">
+  <img src="Resort Map_CONCEPT.png" alt="Pale Lake Resort Map" class="resort-map">
+  <p class="map-caption">Pale Lake Cabin Resort — you are here. the road is not.</p>
+ </div>
+</div>
+
+<!-- ─── PROTAGONIST ─── -->
+<div class="section">
+  <p class="section-label">You</p>
+  <p class="story-title">You weren't supposed to end up here. You followed the road anyway.</p>
+  <div class="story-body">
+    <p>You are a photographer. Late twenties. The kind of person who notices everything. Files it, cross-references it, and delivers it back with commentary at the exact wrong moment. You have been too much your entire life and made an uneasy peace with most of it. The camera helps. The world makes more sense framed and finite.</p>
+    <p>At Pale Lake the camera lies. This is going to be a problem.</p>
+    <p>You choose your name. You choose your gender. You choose whether you're the kind of person who reaches for someone's hand in the dark or waits to see if they'll reach for yours. You choose how you love and how cruel you're willing to be when love gets complicated. Every choice shapes what you uncover, who lets you in, and what the lake decides to do with you.</p>
+    <p>The mask is yours to keep or yours to lose. Pale Lake is the first place it has ever felt optional. That is exactly the trap. You'll figure that out eventually. Probably.</p>
+  </div>
+</div>
+
+<!-- ─── FEATURES + DETAILS ─── -->
+<div class="section" style="padding: 0; border-bottom: 1px solid var(--border);">
+  <div class="grid-2">
+    <div class="grid-cell">
+  <div class="grid-cell-title">✦ Features</div>
+  <p>
+    Six romanceable routes. Each one darker than it first appears<br>
+    A camera that sees more than it should<br>
+    Three tiers of horror that escalate the closer you get<br>
+    Romance that earns it... and holds nothing back<br>
+    Knowledge that carries between playthroughs<br>
+    A secret ending for players who think they've seen everything
+  </p>
+</div>
+    <div class="grid-cell">
+      <div class="grid-cell-title">✦ Details</div>
+      <p>
+        Engine: Ren'Py<br>
+        Platform: PC / Mac<br>
+        Est. playtime: longer than you planned<br>
+        Language: English<br>
+        Route lock system<br>
+        Multiple endings per route
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ─── CHARACTERS ─── -->
+<div class="section">
+  <p class="section-label">The Staff</p>
+  <div class="chars-grid">
+
+  <div class="char-card">
+    <div class="char-card-placeholder">
+  <span>art coming soon</span>
+  </div>
+    <div class="char-card-name">WADE</div>
+    <div class="char-card-role">Groundskeeper</div>
+    <div class="char-card-desc">Seven feet of waterlogged, pale undead muscle that moves through the resort like fog. Soundless, inevitable, everywhere at once. He maintains everything without being asked and says almost nothing. He wears a mask he never removes in front of guests. Beneath it, if you ever earn that, is a face that has no business being that beautiful.</div>
+  </div>
+
+  <div class="char-card">
+    <div class="char-card-placeholder">
+  <span>art coming soon</span>
+  </div>
+    <div class="char-card-name">VANCE</div>
+    <div class="char-card-role">Front Desk</div>
+    <div class="char-card-desc">Devastatingly good at his job. He knew exactly when you'd arrive, remembers everything you've mentioned in passing, and will make you feel like the most interesting person at Pale Lake. Classic cloak shroud and mask but tailored, fitted, the cloak moves well. The mask is pristine white with gold detailing he added himself. He has opinions about it. The murdery impulses are real and he doesn't pretend otherwise. He's working on it.</div>
+  </div>
+
+  <div class="char-card">
+    <div class="char-card-placeholder">
+    <span>art coming soon</span>
+    </div>
+    <div class="char-card-name">FOLLY</div>
+    <div class="char-card-role">Activities</div>
+    <div class="char-card-desc">The reason guests aren't sure if Pale Lake is terrifying or the best time they've ever had. Usually both. Simultaneously. Tall, angular, dark jester aesthetic: jewel tones, a high ruffled collar, face paint that is always immaculate and always slightly different from the day before. Ancient and cosmic in ways the costume doesn't quite hide. He feeds on fear. He has recently, against his will, started enjoying the laughter. He finds this fascinating. Everyone else finds it alarming.</div>
+  </div>
+
+  <div class="char-card">
+    <div class="char-card-placeholder">
+     <span>art coming soon</span>
+    </div>
+    <div class="char-card-name">DALE</div>
+    <div class="char-card-role">Security</div>
+    <div class="char-card-desc">Nobody remembers Dale arriving. He is simply there in every memory anyone has of the place... at the tree line, at the end of a corridor, outside a cabin window at 3am. Broad, tall, and wrong in a way that registers before it registers as large. Ancient cracked mask the colour of old bone. He does not speak. Once per season he fixates on one guest. Nobody knows how he chooses. Guests who are chosen report feeling, after the initial terror, oddly safe. They're right. Nothing at the resort dares touch them. What Dale gets from this, internally, nobody knows. Whether there's an internal at all is a matter of quiet debate.</div>
+  </div>
+
+  <div class="char-card">
+    <img src="Eli_Portrait_CONCEPT.png" alt="Eli" class="char-card-image">
+    <div class="char-card-name">ELI</div>
+    <div class="char-card-role">The Diner</div>
+    <div class="char-card-desc">The Last Bite closes at nine. It reopens at midnight. Guests find themselves awake at 1am and somehow end up at the diner to find the lights on low, coffee already made, and Eli leaning against the counter like he was expecting you. He's a great conversationalist. He remembers everything you told him. The coffee is perfect. And then at some point he smiles just a little wider than before and something in your body says leave in a very clear voice. Eli won't notice. He's just being friendly. He's so normal. Why does everyone keep looking at him like that.</div>
+  </div>
+
+  <div class="char-card">
+    <img src="Veil_Portrait_CONCEPT.png" alt="Veil" class="char-card-image">
+    <div class="char-card-name">VEIL</div>
+    <div class="char-card-role">Management</div>
+    <div class="char-card-desc">Pale Lake is, technically, Veil's property. It always was. Eight feet tall... nine, it shifts. Pale suit, immaculate. Tendrils of smoke extend from his back and shoulders, dark and slow-moving, curling unconsciously toward warmth. He manages the resort in the way a mountain manages the weather, by existing, and letting everything else orient to that existence. He is learning to understand humans. Catastrophically slowly. When a guest earns his genuine attention they will find a tendril resting very gently on their shoulder like a question. He means it as comfort. Most guests find it deeply unsettling. A few, somehow, do not. Those ones he remembers for a very long time.</div>
+    <div class="char-card-locked">✦ unlocks after all other routes</div>
+  </div>
+
+</div>
+
+<!-- ─── DEVLOG ─── -->
+<div class="section">
+  <p class="section-label">Devlog</p>
+  <div class="devlog-list">
+    <div class="devlog-item">
+      <div class="devlog-dot dot-active"></div>
+      <div class="devlog-date">Mar 2025</div>
+      <div class="devlog-text">Game systems deep document complete — antagonist, curse mechanics, photo system &amp; True Ending locked 🌊</div>
+    </div>
+    <div class="devlog-item">
+      <div class="devlog-dot dot-mid"></div>
+      <div class="devlog-date">Feb 2025</div>
+      <div class="devlog-text">Common route fully outlined. Wade's route outline + first scenes drafted 🕯</div>
+    </div>
+    <div class="devlog-item">
+      <div class="devlog-dot dot-old"></div>
+      <div class="devlog-date">Jan 2025</div>
+      <div class="devlog-text">World rules and day structure complete 🌲</div>
+    </div>
+   <div iv class="devlog-item">
+      <div class="devlog-dot dot-old"></div>
+      <div class="devlog-date">Dec 2025</div>
+      <div class="devlog-text">6 romanceable characters drafted</div>
+  </div>
+  <div iv class="devlog-item">
+      <div class="devlog-dot dot-old"></div>
+      <div class="devlog-date">Nov 2025</div>
+      <div class="devlog-text">Core concept decided</div>
+  </div>
+</div>
+
+<!-- ─── ABOUT ─── -->
+<div class="section">
+  <p class="section-label">About the Dev</p>
+  <img src="devimage.png" alt="Trisydian" class="dev-image">
+  <div class="story-body">
+  <p>Trisydian is a chaos goblin with a death fixation, a horror film problem, and an embarrassing number of BL comics in their reading queue. Checkout Never: Pale Lake is what happens when all of that collides with a lifelong video game obsession and too much unsupervised time with a game design document.</p>
+  <p>This is a first solo dev project built with genuine love for the genre and a probably unhealthy attachment to the characters living in it. If you like horror that gets under your skin, romance that earns it, and lakes that wants to eat you... you're in the right place.</p>
+</div>
+</div>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <p>Checkout Never: Pale Lake &nbsp;·&nbsp; in development &nbsp;·&nbsp; the road only goes one way</p>
+</footer>
+
+</body>
+</html>
