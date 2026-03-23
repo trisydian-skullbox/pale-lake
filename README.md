@@ -30,7 +30,7 @@ Here we are.
 
 ## Why This Game Specifically
 
-I wanted to play a game with boy-love coded characters that could be approached from a male or female perspective. I wanted graphic horror that kept everybody on their toes. I wanted romance that earned it and didn't apologise for where it went. I wanted BOT! The graphic violence AND the graphic NSFW content in the same game, treated with equal weight.
+I wanted to play a game with boy-love coded characters that could be approached from a male or female perspective. I wanted graphic horror that kept everybody on their toes. I wanted romance that earned it and didn't apologise for where it went. I wanted BOTH! The graphic violence AND the graphic NSFW content in the same game, treated with equal weight.
 
 I haven't found that game. So I'm making it.
 
